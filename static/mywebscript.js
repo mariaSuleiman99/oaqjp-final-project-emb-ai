@@ -1,12 +1,22 @@
-let RunSentimentAnalysis = ()=>{
-    textToAnalyze = document.getElementById("textToAnalyze").value;
+function RunSentimentAnalysis() {
+    const textToAnalyze = document.getElementById("textToAnalyze").value;
 
-    let xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            document.getElementById("system_response").innerHTML = xhttp.responseText;
-        }
-    };
-    xhttp.open("GET", "emotionDetector?textToAnalyze"+"="+textToAnalyze, true);
-    xhttp.send();
+    if (!textToAnalyze || textToAnalyze.trim() === "") {
+        document.getElementById("system_response").innerHTML = "Invalid text! Please try again!";
+        return;
+    }
+
+    fetch("/emotionDetector?textToAnalyze=" + encodeURIComponent(textToAnalyze))
+        .then(response => response.text())
+        .then(result => {
+            if (result.includes("Invalid text!")) {
+                document.getElementById("system_response").innerHTML = result;
+            } else {
+                document.getElementById("system_response").innerHTML = result;
+            }
+        })
+        .catch(err => {
+            document.getElementById("system_response").innerHTML = "An error occurred. Please try again.";
+            console.error(err);
+        });
 }
